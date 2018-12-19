@@ -76,9 +76,9 @@ void QJsonTreeItem::setValue(const QString &value)
     mValue = value;
 }
 
-void QJsonTreeItem::setValue(const double& value)
+void QJsonTreeItem::setValue(const QVariant& value)
 {
-    mDValue = value;
+    qVal = value;
 }
 
 void QJsonTreeItem::setType(const QJsonValue::Type &type)
@@ -96,9 +96,9 @@ QString QJsonTreeItem::value() const
     return mValue;
 }
 
-double QJsonTreeItem::double_value() const
+QVariant QJsonTreeItem::q_value() const
 {
-    return mDValue;
+    return qVal;
 }
 
 QJsonValue::Type QJsonTreeItem::type() const
@@ -139,7 +139,7 @@ QJsonTreeItem* QJsonTreeItem::load(const QJsonValue& value, QJsonTreeItem* paren
             ++index;
         }
     }else if ( value.isDouble()){
-        rootItem->setValue(value.toDouble());
+        rootItem->setValue(value.toVariant());
         rootItem->setType(value.type());
     } else {
         rootItem->setValue(value.toVariant().toString());
@@ -251,7 +251,7 @@ QVariant QJsonModel::data(const QModelIndex &index, int role) const
 
         if (index.column() == 1) {
             if (item->type() == QJsonValue::Double) {
-                return QString("%1").arg(item->double_value());
+                return QString("%1").arg(item->q_value().toDouble());
             } else {
                 return QString("%1").arg(item->value());
             }
@@ -259,7 +259,7 @@ QVariant QJsonModel::data(const QModelIndex &index, int role) const
     } else if (Qt::EditRole == role) {
         if (index.column() == 1) {
             if (item->type() == QJsonValue::Double) {
-                return QString("%1").arg(item->double_value());
+                return QString("%1").arg(item->q_value().toDouble());
             } else {
                 return QString("%1").arg(item->value());
             }
@@ -277,7 +277,7 @@ bool QJsonModel::setData(const QModelIndex &index, const QVariant &value, int ro
         if (col == 1) {
             QJsonTreeItem *item = static_cast<QJsonTreeItem*>(index.internalPointer());
             if (item->type() == QJsonValue::Double) {
-                item->setValue(value.toDouble());
+                item->setValue(value);
             } else {
                 item->setValue(value.toString());
             }
@@ -408,7 +408,7 @@ QJsonValue  QJsonModel::genJson(QJsonTreeItem * item) const
         }
         return arr;
     } else if (QJsonValue::Double == type) {
-        QJsonValue va(item->double_value());
+        QJsonValue va = QJsonValue::fromVariant(item->q_value());
         return va;
     } else {
         QJsonValue va(item->value());

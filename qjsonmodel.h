@@ -47,11 +47,11 @@ public:
     int row() const;
     void setKey(const QString& key);
     void setValue(const QString& value);
-    void setValue(const double& value);
+    void setValue(const QVariant& value);
     void setType(const QJsonValue::Type& type);
     QString key() const;
     QString value() const;
-    double double_value() const;
+    QVariant q_value() const;
     QJsonValue::Type type() const;
 
 
@@ -64,6 +64,7 @@ private:
     double mDValue;
     QString mKey;
     QString mValue;
+    QVariant qVal;
     QJsonValue::Type mType;
     QList<QJsonTreeItem*> mChilds;
     QJsonTreeItem * mParent;
